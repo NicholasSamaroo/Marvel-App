@@ -50,8 +50,8 @@ public class MainActivity extends AppCompatActivity {
         /*  Part of the call to the API requires us to pass an MD5 hash of a time stamp, our private key, and our public key
             The time stamp is chosen from system time and you need to provide your private and public keys as indicated
         * */
-        publicKey = "c55b9a56c8fd2080fc238d4666c2386d";
-        privateKey = "5b851630b7f50916442ac0b1d9edae6f30737b36";
+        publicKey = "YOUR_PUBLIC_KEY_HERE";
+        privateKey = "YOUR_PRIVATE_KEY_HERE";
         timeStamp = System.currentTimeMillis();
         hash = MD5(timeStamp + privateKey + publicKey);
 
@@ -60,7 +60,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 if(!(editText.getText().toString().equals(""))) {
-                    Call<Wrapper> call = marvelAPI.getCharacters(timeStamp, hash, editText.getText().toString(),"c55b9a56c8fd2080fc238d4666c2386d");
+                    Call<Wrapper> call = marvelAPI.getCharacters(timeStamp, hash, editText.getText().toString(),"YOUR_PUBLIC_KEY_HERE");
                     call.enqueue(new Callback<Wrapper>() {
                         @Override
                         public void onResponse(Call<Wrapper> call, Response<Wrapper> response) {

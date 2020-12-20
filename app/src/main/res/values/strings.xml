@@ -1,3 +1,7 @@
 <resources>
     <string name="app_name">Marvel</string>
+    <string name="imageView_content_description">Thumbnail of Marvel character</string>
+    <string name="edit_text_character">Enter a character name</string>
+    <string name="title_activity_detail">Details</string>
+    <string name="search">SEARCH</string>
 </resources>

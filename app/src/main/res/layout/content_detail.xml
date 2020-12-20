@@ -10,6 +10,7 @@
         android:id="@+id/characterThumbnailDetail"
         android:layout_width="match_parent"
         android:layout_height="250dp"
+        android:contentDescription="@string/imageView_content_description"
         android:fitsSystemWindows="true"
         android:scaleType="fitXY" />
 
@@ -17,9 +18,9 @@
         android:id="@+id/characterDescription"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:textStyle="bold"
+        android:layout_margin="10dp"
         android:textSize="18sp"
-        android:layout_margin="10dp"/>
+        android:textStyle="bold" />
 
     <TextView
         android:id="@+id/characterNameDetail"
@@ -29,14 +30,41 @@
         android:layout_marginEnd="10dp"
         android:layout_marginBottom="10dp"
         android:textSize="18sp"
-        android:textStyle="italic"/>
+        android:textStyle="italic" />
 
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/detailRecyclerView"
+    <RelativeLayout
+        android:id="@+id/detailRelativeLayout"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:scrollbars="vertical"
-        android:layout_marginStart="10dp"
-        android:layout_marginBottom="30dp"/>
+        android:layout_height="0dp"
+        android:layout_weight="1">
+
+        <View
+            style="@style/Divider"
+            android:layout_alignBaseline="@+id/detailRecyclerView"
+            android:layout_marginStart="10dp" />
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/detailRecyclerView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="10dp"
+            android:paddingBottom="30dp"
+            android:scrollbars="vertical" />
+
+        <View
+            style="@style/Divider"
+            android:layout_above="@+id/availableAndReturned"
+            android:layout_marginStart="10dp"/>
+
+        <TextView
+            android:id="@+id/availableAndReturned"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignBottom="@+id/detailRecyclerView"
+            android:text="TEST"
+            android:layout_marginStart="10dp"
+            android:layout_marginBottom="10dp"/>
+
+    </RelativeLayout>
 
 </LinearLayout>

@@ -30,28 +30,23 @@ import retrofit2.Response;
 
 public class MainActivity extends AppCompatActivity {
 
-    long timeStamp;
-    String privateKey;
-    String publicKey;
-    String hash;
-    RecyclerView mRecyclerView;
-    CharacterAdapter adapter;
-    EditText editText;
-    Button search;
-    ArrayList<Results> results;
+    private long timeStamp;
+    private String hash;
+    private EditText editText;
+    private ArrayList<Results> results;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         editText = findViewById(R.id.editText);
-        search = findViewById(R.id.search);
+        Button search = findViewById(R.id.search);
 
         /*  Part of the call to the API requires us to pass an MD5 hash of a time stamp, our private key, and our public key
             The time stamp is chosen from system time and you need to provide your private and public keys as indicated
         * */
-        publicKey = "YOUR_PUBLIC_KEY_HERE";
-        privateKey = "YOUR_PRIVATE_KEY_HERE";
+        String publicKey = "YOUR_PUBLIC_KEY_HERE";
+        String privateKey = "YOUR_PRIVATE_KEY_HERE";
         timeStamp = System.currentTimeMillis();
         hash = MD5(timeStamp + privateKey + publicKey);
 
@@ -89,7 +84,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     // Generate MD5 hash
-    public String MD5(String input) {
+    private String MD5(String input) {
         try {
             MessageDigest md = MessageDigest.getInstance("MD5");
             BigInteger md5Data = new BigInteger(1, md.digest(input.getBytes()));
@@ -100,9 +95,9 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    public void loadDataRecyclerView(ArrayList<Results> response) {
-        mRecyclerView = findViewById(R.id.recyclerView);
-        adapter = new CharacterAdapter(getApplicationContext(),response);
+    private void loadDataRecyclerView(ArrayList<Results> response) {
+        RecyclerView mRecyclerView = findViewById(R.id.recyclerView);
+        CharacterAdapter adapter = new CharacterAdapter(getApplicationContext(), response);
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false);
         mRecyclerView.setLayoutManager(linearLayoutManager);
         mRecyclerView.setItemAnimator(new SlideInUpAnimator());

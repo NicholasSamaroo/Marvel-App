@@ -21,22 +21,7 @@ import android.widget.TextView;
 import java.util.ArrayList;
 
 public class DetailActivity extends AppCompatActivity {
-    String characterThumbnail;
-    String characterName;
-    String characterDescription;
-    String comicsFeaturedIn;
-    int available;
-    int returned;
-    ArrayList<ComicItems> comicList;
-
-    ImageView characterThumbnailImageView;
-    TextView characterDescriptionTextView;
-    TextView characterNameDetail;
-    TextView logistics;
-    View relativeLayout;
-
-    RecyclerView recyclerView;
-    ComicsAdapter adapter;
+    private ImageView characterThumbnailImageView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -48,20 +33,20 @@ public class DetailActivity extends AppCompatActivity {
         this.getSupportActionBar().setHomeAsUpIndicator(R.drawable.ic_baseline_close_24);
 
         // Initialize our views
-        characterDescriptionTextView = findViewById(R.id.characterDescription);
+        TextView characterDescriptionTextView = findViewById(R.id.characterDescription);
         characterThumbnailImageView = findViewById(R.id.characterThumbnailDetail);
-        characterNameDetail = findViewById(R.id.characterNameDetail);
-        logistics = findViewById(R.id.availableAndReturned);
-        relativeLayout = findViewById(R.id.detailRelativeLayout);
+        TextView characterNameDetail = findViewById(R.id.characterNameDetail);
+        TextView logistics = findViewById(R.id.availableAndReturned);
+        View relativeLayout = findViewById(R.id.detailRelativeLayout);
 
         // Get the values from the intent passed from the Character Adapter
         Intent intent = getIntent();
-        characterThumbnail = intent.hasExtra("thumbnail") ? intent.getStringExtra("thumbnail") : "Default";
-        characterName = intent.hasExtra("characterName") ? intent.getStringExtra("characterName") : "Character name not provided";
-        characterDescription = intent.hasExtra("characterDescription") ? intent.getStringExtra("characterDescription") : "Default";
-        available = intent.hasExtra("available") ? intent.getIntExtra("available", 0) : 0;
-        returned = intent.hasExtra("returned") ? intent.getIntExtra("returned", 0) : 0;
-        comicList = intent.hasExtra("comicList") ? intent.getParcelableArrayListExtra("comicList") : null;
+        String characterThumbnail = intent.hasExtra("thumbnail") ? intent.getStringExtra("thumbnail") : "Default";
+        String characterName = intent.hasExtra("characterName") ? intent.getStringExtra("characterName") : "Character name not provided";
+        String characterDescription = intent.hasExtra("characterDescription") ? intent.getStringExtra("characterDescription") : "Default";
+        int available = intent.hasExtra("available") ? intent.getIntExtra("available", 0) : 0;
+        int returned = intent.hasExtra("returned") ? intent.getIntExtra("returned", 0) : 0;
+        ArrayList<ComicItems> comicList = intent.hasExtra("comicList") ? intent.getParcelableArrayListExtra("comicList") : null;
 
         loadImage(characterThumbnail);
 
@@ -74,6 +59,7 @@ public class DetailActivity extends AppCompatActivity {
         }
 
         // If there are no comics returned from the API, hide the recycler view
+        String comicsFeaturedIn;
         if(comicList.isEmpty()) {
             comicsFeaturedIn = "There are no comics listed for " + characterName + ". All data provided by Marvel © 2020 MARVEL.";
             relativeLayout.setVisibility(View.GONE);
@@ -88,16 +74,16 @@ public class DetailActivity extends AppCompatActivity {
         characterNameDetail.setText(comicsFeaturedIn);
     }
 
-    public void loadImage(String imagePath) {
+    private void loadImage(String imagePath) {
         Picasso.with(getApplicationContext())
                 .load(imagePath)
                 .placeholder(R.drawable.placeholder)
                 .into(characterThumbnailImageView);
     }
 
-    public void instantiateRecyclerView(ArrayList<ComicItems> items) {
-        recyclerView = findViewById(R.id.detailRecyclerView);
-        adapter = new ComicsAdapter(items);
+    private void instantiateRecyclerView(ArrayList<ComicItems> items) {
+        RecyclerView recyclerView = findViewById(R.id.detailRecyclerView);
+        ComicsAdapter adapter = new ComicsAdapter(items);
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false);
         recyclerView.setLayoutManager(linearLayoutManager);
         recyclerView.setAdapter(adapter);

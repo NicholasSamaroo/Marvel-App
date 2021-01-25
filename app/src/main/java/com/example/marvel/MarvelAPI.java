@@ -8,7 +8,6 @@ import retrofit2.http.Query;
 
 public interface MarvelAPI {
 
-
     @GET("v1/public/characters")
     Call<Wrapper> getCharacters(@Query("ts") long ts,
                                 @Query("hash") String hash,

@@ -27,23 +27,11 @@ public class Results {
         return description;
     }
 
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
     public ImageObject getThumbnail() {
         return thumbnail;
     }
 
-    public void setThumbnail(ImageObject thumbnail) {
-        this.thumbnail = thumbnail;
-    }
-
     public Comics getComics() {
         return comics;
-    }
-
-    public void setComics(Comics comics) {
-        this.comics = comics;
     }
 }

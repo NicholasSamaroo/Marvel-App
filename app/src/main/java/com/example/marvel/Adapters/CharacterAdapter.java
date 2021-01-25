@@ -20,40 +20,60 @@ import com.squareup.picasso.Picasso;
 import java.util.ArrayList;
 
 
-public class CharacterAdapter extends RecyclerView.Adapter<CharacterAdapter.ViewHolder> {
-    private ArrayList<Results> resultsList;
-    private Context context;
+public class CharacterAdapter extends RecyclerView.Adapter<CharacterAdapter.CharacterViewHolder> {
 
-    public CharacterAdapter(Context applicationContext, ArrayList<Results> results) {
-        this.context = applicationContext;
-        this.resultsList = results;
+    // Interface for passing the position of the clicked recycler view item to the Main Activity
+    public interface OnCardListener {
+        void OnCardClick(int position);
     }
 
-    public static class ViewHolder extends RecyclerView.ViewHolder {
+    private final ArrayList<Results> resultsList;
+    private final Context context;
+    private final OnCardListener mOnCardListener;
+
+    public CharacterAdapter(Context applicationContext, ArrayList<Results> results, OnCardListener onCardListener) {
+        this.context = applicationContext;
+        this.resultsList = results;
+        this.mOnCardListener = onCardListener;
+    }
+
+    public static class CharacterViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
         public ImageView characterImage;
         public TextView characterText;
-        public CardView cardView;
+        public OnCardListener onCardListener;
 
-        public ViewHolder(@NonNull View itemView) {
+        public CharacterViewHolder(@NonNull View itemView, OnCardListener onCardListener) {
             super(itemView);
             characterImage = itemView.findViewById(R.id.characterThumbnail);
             characterText = itemView.findViewById(R.id.characterName);
-            cardView = itemView.findViewById(R.id.card);
+            this.onCardListener = onCardListener;
+
+            // Refer to the View.OnClickListener interface the view holder is implementing
+            itemView.setOnClickListener(this);
+        }
+
+        /* Whenever a view holder is clicked, we want to pass its position to the main activity
+        *  where we navigate to the details activity with the pertinent information*/
+        @Override
+        public void onClick(View v) {
+            onCardListener.OnCardClick(getAdapterPosition());
         }
     }
     @NonNull
     @Override
-    public CharacterAdapter.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+    public CharacterAdapter.CharacterViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         LayoutInflater layoutInflater = LayoutInflater.from(parent.getContext());
         View cardView = layoutInflater.inflate(R.layout.character_card, parent, false);
-        return new ViewHolder(cardView);
+        return new CharacterViewHolder(cardView, mOnCardListener);
     }
 
+    /* Instead of setting an onClickListener every time we need to bind data to a view holder,
+    *  we instead create an interface in the adapter that passes the item position back to the main activity */
     @Override
-    public void onBindViewHolder(@NonNull CharacterAdapter.ViewHolder holder, int position) {
+    public void onBindViewHolder(@NonNull CharacterAdapter.CharacterViewHolder holder, int position) {
         holder.characterText.setText(resultsList.get(position).getName());
 
-        // Example path ; http://i.annihil.us/u/prod/marvel/i/mg/3/40/4bb4680432f73/portrait_xlarge.jpg
+        // Example path  http://i.annihil.us/u/prod/marvel/i/mg/3/40/4bb4680432f73/portrait_xlarge.jpg
         String formImagePath = resultsList.get(position).getThumbnail().getPath().replace("http", "https")
                 + "/landscape_medium." + resultsList.get(position).getThumbnail().getExtension();
 
@@ -62,21 +82,6 @@ public class CharacterAdapter extends RecyclerView.Adapter<CharacterAdapter.View
                 .fit()
                 .placeholder(R.drawable.placeholder)
                 .into(holder.characterImage);
-
-        holder.cardView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Context context = v.getContext();
-                Intent intent = new Intent(context, DetailActivity.class);
-                intent.putExtra("thumbnail", formImagePath);
-                intent.putExtra("characterName", resultsList.get(position).getName());
-                intent.putExtra("characterDescription", resultsList.get(position).getDescription());
-                intent.putExtra("available", resultsList.get(position).getComics().getAvailable());
-                intent.putExtra("returned", resultsList.get(position).getComics().getReturned());
-                intent.putExtra("comicList", resultsList.get(position).getComics().getItems());
-                context.startActivity(intent);
-            }
-        });
     }
 
     @Override

@@ -14,7 +14,7 @@ import com.example.marvel.R;
 import java.util.ArrayList;
 
 public class ComicsAdapter extends RecyclerView.Adapter<ComicsAdapter.ViewHolder> {
-    ArrayList<ComicItems> comicItems;
+    private ArrayList<ComicItems> comicItems;
 
     public ComicsAdapter(ArrayList<ComicItems> items) {
         this.comicItems = items;

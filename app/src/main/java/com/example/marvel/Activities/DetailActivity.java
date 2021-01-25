@@ -13,10 +13,13 @@ import androidx.appcompat.widget.Toolbar;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.text.TextUtils;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
+
+import org.apache.commons.codec.binary.StringUtils;
 
 import java.util.ArrayList;
 
@@ -39,19 +42,23 @@ public class DetailActivity extends AppCompatActivity {
         TextView logistics = findViewById(R.id.availableAndReturned);
         View relativeLayout = findViewById(R.id.detailRelativeLayout);
 
-        // Get the values from the intent passed from the Character Adapter
+        // Get the values from the intent passed from the implemented interface method in the Main Activity
         Intent intent = getIntent();
-        String characterThumbnail = intent.hasExtra("thumbnail") ? intent.getStringExtra("thumbnail") : "Default";
+        String characterThumbnail = intent.hasExtra("thumbnail") ? intent.getStringExtra("thumbnail") : "placeholder";
         String characterName = intent.hasExtra("characterName") ? intent.getStringExtra("characterName") : "Character name not provided";
         String characterDescription = intent.hasExtra("characterDescription") ? intent.getStringExtra("characterDescription") : "Default";
         int available = intent.hasExtra("available") ? intent.getIntExtra("available", 0) : 0;
         int returned = intent.hasExtra("returned") ? intent.getIntExtra("returned", 0) : 0;
         ArrayList<ComicItems> comicList = intent.hasExtra("comicList") ? intent.getParcelableArrayListExtra("comicList") : null;
 
+        // Load the character thumbnail into the image view located at the top of the activity
         loadImage(characterThumbnail);
 
         // Set character description
-        if (characterDescription.equals("")) {
+        /* Some character descriptions have white space, and strings with white space still have length
+        *  TextUtils.isEmpty() will not account for that since it only checks if the string is null or length 0
+        *  So we account for white space by using a regular expression that checks for white space of any length */
+        if (TextUtils.isEmpty(characterDescription) || characterDescription.matches("\\s+")) {
             String noDesc = "There is no description provided for " + characterName + ". All data provided by Marvel © 2020 MARVEL.";
             characterDescriptionTextView.setText(noDesc);
         } else {
@@ -60,7 +67,7 @@ public class DetailActivity extends AppCompatActivity {
 
         // If there are no comics returned from the API, hide the recycler view
         String comicsFeaturedIn;
-        if(comicList.isEmpty()) {
+        if(comicList == null || comicList.isEmpty()) {
             comicsFeaturedIn = "There are no comics listed for " + characterName + ". All data provided by Marvel © 2020 MARVEL.";
             relativeLayout.setVisibility(View.GONE);
         } else {
@@ -74,13 +81,21 @@ public class DetailActivity extends AppCompatActivity {
         characterNameDetail.setText(comicsFeaturedIn);
     }
 
+    /* If for some reason we did not get the image path associated with the character thumbnail from the intent, load in a placeholder image instead */
     private void loadImage(String imagePath) {
-        Picasso.with(getApplicationContext())
-                .load(imagePath)
-                .placeholder(R.drawable.placeholder)
-                .into(characterThumbnailImageView);
+        if(imagePath.equals("placeholder")) {
+            Picasso.with(getApplicationContext())
+                    .load(R.drawable.placeholder)
+                    .into(characterThumbnailImageView);
+        } else {
+            Picasso.with(getApplicationContext())
+                    .load(imagePath)
+                    .placeholder(R.drawable.placeholder)
+                    .into(characterThumbnailImageView);
+        }
     }
 
+    // Instantiate the recycler view for the list of comics
     private void instantiateRecyclerView(ArrayList<ComicItems> items) {
         RecyclerView recyclerView = findViewById(R.id.detailRecyclerView);
         ComicsAdapter adapter = new ComicsAdapter(items);

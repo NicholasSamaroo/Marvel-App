@@ -35,8 +35,7 @@
     <RelativeLayout
         android:id="@+id/detailRelativeLayout"
         android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1">
+        android:layout_height="match_parent">
 
         <View
             style="@style/Divider"
@@ -61,7 +60,6 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignBottom="@+id/detailRecyclerView"
-            android:text="TEST"
             android:layout_marginStart="10dp"
             android:layout_marginBottom="10dp"/>
 

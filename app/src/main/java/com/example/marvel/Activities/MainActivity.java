@@ -1,5 +1,7 @@
 package com.example.marvel.Activities;
 
+import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -28,8 +30,7 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-public class MainActivity extends AppCompatActivity {
-
+public class MainActivity extends AppCompatActivity implements CharacterAdapter.OnCardListener {
     private long timeStamp;
     private String hash;
     private EditText editText;
@@ -45,8 +46,8 @@ public class MainActivity extends AppCompatActivity {
         /*  Part of the call to the API requires us to pass an MD5 hash of a time stamp, our private key, and our public key
             The time stamp is chosen from system time and you need to provide your private and public keys as indicated
         * */
-        String publicKey = "YOUR_PUBLIC_KEY_HERE";
-        String privateKey = "YOUR_PRIVATE_KEY_HERE";
+        String publicKey = "c55b9a56c8fd2080fc238d4666c2386d";
+        String privateKey = "5b851630b7f50916442ac0b1d9edae6f30737b36";
         timeStamp = System.currentTimeMillis();
         hash = MD5(timeStamp + privateKey + publicKey);
 
@@ -55,7 +56,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 if(!(editText.getText().toString().equals(""))) {
-                    Call<Wrapper> call = marvelAPI.getCharacters(timeStamp, hash, editText.getText().toString(),"YOUR_PUBLIC_KEY_HERE");
+                    Call<Wrapper> call = marvelAPI.getCharacters(timeStamp, hash, editText.getText().toString(),"c55b9a56c8fd2080fc238d4666c2386d");
                     call.enqueue(new Callback<Wrapper>() {
                         @Override
                         public void onResponse(Call<Wrapper> call, Response<Wrapper> response) {
@@ -63,8 +64,9 @@ public class MainActivity extends AppCompatActivity {
                                 if(response.body().getData().getResults().isEmpty()) {
                                     Toast.makeText(getApplicationContext(), "Not found, please try again", Toast.LENGTH_LONG).show();
                                 } else {
+                                    editText.getText().clear();
                                     results = response.body().getData().getResults();
-                                    loadDataRecyclerView(results);
+                                    loadDataRecyclerView();
                                 }
                             } else {
                                 Toast.makeText(getApplicationContext(), "Not a successful response received", Toast.LENGTH_LONG).show();
@@ -95,13 +97,30 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    private void loadDataRecyclerView(ArrayList<Results> response) {
+    private void loadDataRecyclerView() {
         RecyclerView mRecyclerView = findViewById(R.id.recyclerView);
-        CharacterAdapter adapter = new CharacterAdapter(getApplicationContext(), response);
+        CharacterAdapter adapter = new CharacterAdapter(this, results, this);
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false);
         mRecyclerView.setLayoutManager(linearLayoutManager);
         mRecyclerView.setItemAnimator(new SlideInUpAnimator());
         mRecyclerView.setAdapter(adapter);
     }
 
+    /* Implemented the interface defined in the CharacterAdapter which was created to listen for recycler view clicks
+    *  When an item is clicked in the recycler view, the position of the item is brought back to this activity
+    *  Since the list we passed to the adapter was instantiated here, we can use the position received from the adapter
+    *  to navigate to the DetailsActivity */
+    @Override
+    public void OnCardClick(int position) {
+        String formImagePath = results.get(position).getThumbnail().getPath().replace("http", "https")
+                + "/landscape_medium." + results.get(position).getThumbnail().getExtension();
+        Intent intent = new Intent(this, DetailActivity.class);
+        intent.putExtra("thumbnail", formImagePath);
+        intent.putExtra("characterName", results.get(position).getName());
+        intent.putExtra("characterDescription", results.get(position).getDescription());
+        intent.putExtra("available", results.get(position).getComics().getAvailable());
+        intent.putExtra("returned", results.get(position).getComics().getReturned());
+        intent.putExtra("comicList", results.get(position).getComics().getItems());
+        startActivity(intent);
+    }
 }

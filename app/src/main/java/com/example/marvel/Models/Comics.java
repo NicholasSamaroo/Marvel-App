@@ -11,9 +11,7 @@ public class Comics implements Parcelable {
     private int returned;
 
     protected Comics(Parcel in) {
-        available = in.readInt();
         items = in.createTypedArrayList(ComicItems.CREATOR);
-        returned = in.readInt();
     }
 
     public static final Creator<Comics> CREATOR = new Creator<Comics>() {
@@ -32,24 +30,12 @@ public class Comics implements Parcelable {
         return available;
     }
 
-    public void setAvailable(int available) {
-        this.available = available;
-    }
-
     public ArrayList<ComicItems> getItems() {
         return items;
     }
 
-    public void setItems(ArrayList<ComicItems> items) {
-        this.items = items;
-    }
-
     public int getReturned() {
         return returned;
-    }
-
-    public void setReturned(int returned) {
-        this.returned = returned;
     }
 
     @Override
@@ -59,8 +45,6 @@ public class Comics implements Parcelable {
 
     @Override
     public void writeToParcel(Parcel dest, int flags) {
-        dest.writeInt(available);
         dest.writeTypedList(items);
-        dest.writeInt(returned);
     }
 }

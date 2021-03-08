@@ -84,11 +84,11 @@ public class DetailActivity extends AppCompatActivity {
     /* If for some reason we did not get the image path associated with the character thumbnail from the intent, load in a placeholder image instead */
     private void loadImage(String imagePath) {
         if(imagePath.equals("placeholder")) {
-            Picasso.with(getApplicationContext())
+            Picasso.get()
                     .load(R.drawable.placeholder)
                     .into(characterThumbnailImageView);
         } else {
-            Picasso.with(getApplicationContext())
+            Picasso.get()
                     .load(imagePath)
                     .placeholder(R.drawable.placeholder)
                     .into(characterThumbnailImageView);

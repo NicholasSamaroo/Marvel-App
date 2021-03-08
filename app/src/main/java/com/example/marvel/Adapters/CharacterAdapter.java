@@ -18,6 +18,7 @@ import com.example.marvel.Models.Results;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
+import java.util.List;
 
 
 public class CharacterAdapter extends RecyclerView.Adapter<CharacterAdapter.CharacterViewHolder> {
@@ -27,14 +28,16 @@ public class CharacterAdapter extends RecyclerView.Adapter<CharacterAdapter.Char
         void OnCardClick(int position);
     }
 
-    private final ArrayList<Results> resultsList;
-    private final Context context;
+    private List<Results> resultsList;
     private final OnCardListener mOnCardListener;
 
-    public CharacterAdapter(Context applicationContext, ArrayList<Results> results, OnCardListener onCardListener) {
-        this.context = applicationContext;
-        this.resultsList = results;
+    public CharacterAdapter(OnCardListener onCardListener) {
         this.mOnCardListener = onCardListener;
+    }
+
+    public void setResultsList(List<Results> resultsList) {
+        this.resultsList = resultsList;
+        notifyDataSetChanged();
     }
 
     public static class CharacterViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
@@ -59,6 +62,7 @@ public class CharacterAdapter extends RecyclerView.Adapter<CharacterAdapter.Char
             onCardListener.OnCardClick(getAdapterPosition());
         }
     }
+
     @NonNull
     @Override
     public CharacterAdapter.CharacterViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
@@ -77,7 +81,7 @@ public class CharacterAdapter extends RecyclerView.Adapter<CharacterAdapter.Char
         String formImagePath = resultsList.get(position).getThumbnail().getPath().replace("http", "https")
                 + "/landscape_medium." + resultsList.get(position).getThumbnail().getExtension();
 
-        Picasso.with(context)
+        Picasso.get()
                 .load(formImagePath)
                 .fit()
                 .placeholder(R.drawable.placeholder)
@@ -86,10 +90,6 @@ public class CharacterAdapter extends RecyclerView.Adapter<CharacterAdapter.Char
 
     @Override
     public int getItemCount() {
-        if(resultsList != null) {
-            return resultsList.size();
-        } else {
-            return 0;
-        }
+       return resultsList == null ? 0 : resultsList.size();
     }
 }

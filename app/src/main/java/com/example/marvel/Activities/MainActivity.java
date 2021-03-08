@@ -1,9 +1,7 @@
 package com.example.marvel.Activities;
 
-import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -31,32 +29,34 @@ import retrofit2.Callback;
 import retrofit2.Response;
 
 public class MainActivity extends AppCompatActivity implements CharacterAdapter.OnCardListener {
-    private long timeStamp;
-    private String hash;
-    private EditText editText;
+
     private ArrayList<Results> results;
+    private CharacterAdapter adapter;
+    private LinearLayoutManager linearLayoutManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        editText = findViewById(R.id.editText);
+
+        EditText editText = findViewById(R.id.editText);
         Button search = findViewById(R.id.search);
+        initRecyclerView();
 
         /*  Part of the call to the API requires us to pass an MD5 hash of a time stamp, our private key, and our public key
             The time stamp is chosen from system time and you need to provide your private and public keys as indicated
         * */
-        String publicKey = "YOUR_PUBLIC_KEY_HERE";
-        String privateKey = "YOUR_PRIVATE_KEY_HERE";
-        timeStamp = System.currentTimeMillis();
-        hash = MD5(timeStamp + privateKey + publicKey);
+        String publicKey = "YOUR_PUBLIC_KEY";
+        String privateKey = "YOUR_PRIVATE_KEY";
+        long timeStamp = System.currentTimeMillis();
+        String hash = MD5(timeStamp + privateKey + publicKey);
 
         MarvelAPI marvelAPI = RetrofitInstance.getRetrofitInstance().create(MarvelAPI.class);
         search.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 if(!(editText.getText().toString().equals(""))) {
-                    Call<Wrapper> call = marvelAPI.getCharacters(timeStamp, hash, editText.getText().toString(),"YOUR_PUBLIC_KEY_HERE");
+                    Call<Wrapper> call = marvelAPI.getCharacters(timeStamp, hash, editText.getText().toString(),"YOUR_PUBLIC_KEY");
                     call.enqueue(new Callback<Wrapper>() {
                         @Override
                         public void onResponse(Call<Wrapper> call, Response<Wrapper> response) {
@@ -66,10 +66,10 @@ public class MainActivity extends AppCompatActivity implements CharacterAdapter.
                                 } else {
                                     editText.getText().clear();
                                     results = response.body().getData().getResults();
-                                    loadDataRecyclerView();
+                                    updateRecyclerView();
                                 }
                             } else {
-                                Toast.makeText(getApplicationContext(), "Not a successful response received", Toast.LENGTH_LONG).show();
+                                Toast.makeText(getApplicationContext(), "Unsuccessful response received", Toast.LENGTH_LONG).show();
                             }
                         }
 
@@ -97,14 +97,21 @@ public class MainActivity extends AppCompatActivity implements CharacterAdapter.
         }
     }
 
-    private void loadDataRecyclerView() {
+    private void initRecyclerView() {
         RecyclerView mRecyclerView = findViewById(R.id.recyclerView);
-        CharacterAdapter adapter = new CharacterAdapter(this, results, this);
-        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false);
+        adapter = new CharacterAdapter(this);
+        linearLayoutManager = new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false);
         mRecyclerView.setLayoutManager(linearLayoutManager);
         mRecyclerView.setItemAnimator(new SlideInUpAnimator());
         mRecyclerView.setAdapter(adapter);
     }
+
+    private void updateRecyclerView() {
+        adapter.setResultsList(results);
+        // When new data is received, we want to scroll back to the first position in the recycler view
+        linearLayoutManager.scrollToPositionWithOffset(0,0);
+    }
+
 
     /* Implemented the interface defined in the CharacterAdapter which was created to listen for recycler view clicks
     *  When an item is clicked in the recycler view, the position of the item is brought back to this activity
